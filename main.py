@@ -49,7 +49,7 @@ def read_file(file_path: Path):
 
 @lru_cache(maxsize=128)
 def generate_answer(prompt, page_number):
-    api_key = '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'
+    api_key = 'your_api_key_here'
     model = 'text-davinci-003'
 
     openai.api_key = api_key
