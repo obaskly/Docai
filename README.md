@@ -48,6 +48,7 @@
 
 ## How To Use
 
+- Put you api key in line 52
 - Run the script
 - Select your file
 - Enter your question and click submit
