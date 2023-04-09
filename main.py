@@ -1,21 +1,13 @@
-import tkinter as tk
+import threading, pdfplumber, docx, openai, concurrent.futures
 from tkinter import ttk
 from tkinter import filedialog
 from ttkthemes import ThemedTk
 from tkinter import messagebox
-import threading
-
-import pdfplumber
-import docx
-import openai
-import numpy as np
-import threading
-import concurrent.futures
 from functools import lru_cache
 from pathlib import Path
-from colorama import Fore, init
+import tkinter as tk
+import numpy as np
 
-init()
 # Set a threshold for confidence scores
 confidence_threshold = 0.3
 
@@ -42,6 +34,7 @@ def read_file(file_path: Path):
     elif file_path.suffix == '.txt':
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
+        pages_text = [(1, text)]
     else:
         raise ValueError("Unsupported file format. Please use a PDF or DOCX file.")
 
@@ -144,38 +137,6 @@ def post_process_answer(answer):
             seen_sentences.add(sent_text)
 
     return ". ".join(unique_sentences)
-
-def main():
-    file_path_str = input(f"{Fore.RED}Please enter the file path of your PDF or DOCX file: " + Fore.WHITE)
-    file_path = Path(file_path_str)
-    
-    try:
-        content = read_file(file_path)
-    except ValueError as e:
-        print(e)
-        return
-
-    max_tokens = 4097
-    content_chunks = split_content(content, max_tokens - 20)
-
-    conversation_history = []
-
-    while True:
-        question = input(f"{Fore.CYAN}\nMe: ")
-
-        if question.lower() == 'exit':
-            break
-
-        conversation_history.append({"role": "system", "content": f"User asked: {question}"})
-
-        answers_and_confidence = process_question_concurrently(question, content_chunks)
-        answers, confidence_scores = zip(*answers_and_confidence)
-
-        best_answer_index = np.argmax(confidence_scores)
-        best_answer = post_process_answer(answers[best_answer_index])
-
-        conversation_history.append({"role": "assistant", "content": f"Assistant answered: {best_answer}"})
-        print(f"{Fore.GREEN}\nGPT: {best_answer}")
 		
 class QuestionAnsweringGUI:
     def __init__(self):
@@ -257,8 +218,6 @@ class QuestionAnsweringGUI:
                     content = entry['content'].replace("User asked: ", "").replace("Assistant answered: ", "")
                     file.write(f"{role}: {content}\n")
             messagebox.showinfo("Info", "Conversation history saved successfully.")
-
-
 
     def run(self):
         self.root.mainloop()
