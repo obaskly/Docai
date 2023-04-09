@@ -62,7 +62,7 @@ It's as simple as that
 
 ## Requirements
 
-* pip install colorama openai pdfplumber python-docx
+`pip install openai pdfplumber python-docx`
 
 ## Copyright
 
